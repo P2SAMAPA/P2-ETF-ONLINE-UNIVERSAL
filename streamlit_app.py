@@ -18,7 +18,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 st.markdown('<div class="main-header">🌐 Universal Portfolio Engine</div>', unsafe_allow_html=True)
-st.markdown('<div class="sub-header">Cover (2010) log‑optimal universal portfolio | Exponential gradient | Parameter‑free | Multi‑window evaluation</div>', unsafe_allow_html=True)
+st.markdown('<div class="sub-header">Cover (2010) log‑optimal universal portfolio | Exponential gradient | Parameter‑free | Top N holdings (100% allocated proportionally)</div>', unsafe_allow_html=True)
 
 st.sidebar.markdown("## 🌐 Universal Portfolio")
 st.sidebar.markdown(f"**Run Date:** `{st.session_state.get('run_date', 'Not loaded')}`")
@@ -69,15 +69,14 @@ if "error" in data:
 st.session_state['run_date'] = data['run_date']
 universes = data["universes"]
 
-st.header(f"🏆 Top {config.TOP_N} Holdings by Universal Portfolio Weight")
+st.header(f"🏆 Top {config.TOP_N} Holdings (100% Allocated Proportionally)")
 
 with st.expander("📖 Interpretation", expanded=True):
     st.markdown("""
     - **Universal Portfolio** (Cover, 1991, 2010) is a parameter‑free, online algorithm that asymptotically achieves the same growth rate as the best constant‑rebalanced portfolio (BCRP) in hindsight.
     - It uses an **exponential gradient (Soft‑Max)** update: \( w_{t+1,i} = w_{t,i} \exp(\eta r_{t,i}) / Z \), where \(\eta\) is a learning rate.
     - The algorithm does not assume any statistical model and is provably log‑optimal.
-    - We run it on a rolling window of past returns (63–4032 days). The final portfolio weights are used to allocate capital.
-    - The **score** for each ETF is its portfolio weight. The engine outputs the top \(N\) holdings (default 5).
+    - We run it on a rolling window of past returns (63–4032 days). The final portfolio weights are used to allocate capital **only to the top 5 ETFs**, but **the weights among them are proportional to the original universal portfolio weights** (summing to 100%).
     - For each ETF, the rolling window that gives the **highest weight** is selected.
     """)
 
@@ -86,7 +85,7 @@ for universe_name, uni_data in universes.items():
     if not top_assets:
         continue
     st.markdown(f'<div class="universe-title">{universe_name.replace("_", " ").title()}</div>', unsafe_allow_html=True)
-    # Display top holdings in a row of cards
+    # Display top holdings in a row of cards (up to 5)
     cols = st.columns(min(len(top_assets), 5))
     for idx, asset in enumerate(top_assets):
         with cols[idx]:
@@ -97,7 +96,7 @@ for universe_name, uni_data in universes.items():
                 <div class="etf-score">best window = {asset.get('best_window', 'N/A')}d</div>
             </div>
             """, unsafe_allow_html=True)
-    # Show final cumulative wealth for the best window (optional)
+    # Show cumulative wealth for the best window
     win_res = uni_data.get("window_results", {})
     if win_res:
         best_win = top_assets[0]['best_window'] if top_assets else None
@@ -123,4 +122,4 @@ for universe_name, uni_data in universes.items():
             st.dataframe(df, use_container_width=True, hide_index=True)
     st.divider()
 
-st.caption("Universal portfolio (Cover, 2010) uses exponential gradient update. Higher weight → larger allocation in the log‑optimal portfolio.")
+st.caption("Universal portfolio (Cover, 2010) uses exponential gradient update. Only the top 5 ETFs receive allocation, but the weights among them are proportional to the original universal portfolio weights.")
