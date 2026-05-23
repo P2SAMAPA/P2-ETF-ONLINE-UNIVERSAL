@@ -21,7 +21,7 @@ UNIVERSES = {
 WINDOWS = [63, 252, 504, 1008, 2016, 4032]
 
 # Universal portfolio parameters
-LEARNING_RATE = 0.05   # η for exponential gradient (constant, can also be adaptive)
+LEARNING_RATE = 0.2   # η for exponential gradient (constant, can also be adaptive)
 USE_ADAPTIVE_ETA = True # if True, eta = 0.1 / sqrt(t)
 
 # Output: number of top ETFs to select (allocate 100% to these)
