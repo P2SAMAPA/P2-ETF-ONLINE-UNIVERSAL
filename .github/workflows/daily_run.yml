@@ -2,7 +2,7 @@ name: Daily Universal Portfolio Run
 
 on:
   schedule:
-    - cron: '35 23 * * 1-6'
+    - cron: '35 22 * * 1-6'
   workflow_dispatch:
 
 jobs:
